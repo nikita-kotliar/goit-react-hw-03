@@ -127,7 +127,7 @@ export const ContactForm = ({ setContacts }) => {
           <ErrorMessage name="tel" as="span" />
         </div>
 
-        <button type="submit">Submit</button>
+        <button className={css.button} type="submit">Submit</button>
       </Form>
     </Formik>
   );

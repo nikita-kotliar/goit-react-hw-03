@@ -76,3 +76,10 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+input:-internal-autofill-selected {
+    appearance: menulist-button;
+    background-image: none !important;
+    background-color: #242424;
+    color: fieldtext !important;
+}

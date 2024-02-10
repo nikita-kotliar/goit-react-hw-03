@@ -34,3 +34,7 @@
   transform: translateY(20px);
   font-size: 12px;
 }
+
+.button {
+    margin-top: 24px;
+}
