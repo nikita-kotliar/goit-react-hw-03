@@ -1,0 +1,18 @@
+.contacts {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+    margin-top: 50px;
+}
+.contact_item {
+    border: 2px solid #000000;
+    border-radius: 20px;
+    padding: 15px;
+    display: flex;
+    width: 380px;
+    justify-content: space-between;
+}
+
+.icon {
+    margin-right: 10px;
+}
