@@ -1,7 +1,6 @@
-import { Formik, Form, Field, ErrorMessage } from "formik";
 import { useId } from "react";
+import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { nanoid } from "nanoid";
 import css from "./ContactForm.module.css";
 
 const FeedbackSchema = Yup.object().shape({
@@ -11,18 +10,16 @@ const FeedbackSchema = Yup.object().shape({
     .required(<span className={css.error}>Required</span>),
   tel: Yup.string()
     .transform((value, originalValue) => {
-      // Видаляємо усі пробіли, риски, дужки
       let phoneNumber = originalValue.replace(/[\s()+-]/g, "");
 
-      // Перевіряємо чи номер починається з "+38" або "38", якщо так - видаляємо
       if (phoneNumber.startsWith("+38") || phoneNumber.startsWith("38")) {
         phoneNumber = phoneNumber.replace(/\+?38/, "");
       }
 
       return phoneNumber;
     })
-    .matches(/^\d{0,10}$/, {
-      message: <span className={css.error}>Too Long! Maximum 10 number.</span>,
+    .matches(/^\d{3,50}$/, {
+      message: <span className={css.error}>Error! Min 3, Max 50 number.</span>,
     })
     .required(<span className={css.error}>Required</span>),
 });
@@ -32,59 +29,14 @@ const initialValues = {
   tel: "",
 };
 
-export const ContactForm = ({ setContacts }) => {
+export default function ContactForm({ onSubmit }) {
   const nameFieldId = useId();
   const telFieldId = useId();
-
-  function formatPhoneNumber(phoneNumber) {
-    phoneNumber = phoneNumber.replace(/\s/g, "").replace(/\+?38/, "");
-
-    const digits = phoneNumber.replace(/\D/g, "");
-
-    let formattedNumber = "+38 (";
-
-    for (let i = 0; i < digits.length; i++) {
-      if (
-        (digits.length === 6 && i === 5) ||
-        (digits.length === 8 && (i === 5 || i === 7))
-      ) {
-        formattedNumber += digits[i];
-      } else {
-        if (i < 3) {
-          formattedNumber += digits[i];
-        } else if (i === 3) {
-          formattedNumber += ") " + digits[i];
-        } else if (i === 5 || i === 7) {
-          formattedNumber += digits[i] + "-";
-        } else {
-          formattedNumber += digits[i];
-        }
-      }
-    }
-
-    return formattedNumber;
-  }
-
-  const handleSubmit = (values, actions) => {
-    console.log(values);
-    actions.resetForm();
-    setContacts((currentContacts) => {
-      const newContact = {
-        id: nanoid(10),
-        name: (values.username =
-          values.username.charAt(0).toUpperCase() + values.username.slice(1)),
-        number: formatPhoneNumber(values.tel),
-      };
-      const updatedContacts = [...currentContacts, newContact];
-      window.localStorage.setItem("contacts", JSON.stringify(updatedContacts));
-      return updatedContacts;
-    });
-  };
 
   return (
     <Formik
       initialValues={initialValues}
-      onSubmit={handleSubmit}
+      onSubmit={onSubmit}
       validationSchema={FeedbackSchema}
     >
       <Form className={css.form}>
@@ -127,8 +79,45 @@ export const ContactForm = ({ setContacts }) => {
           <ErrorMessage name="tel" as="span" />
         </div>
 
-        <button className={css.button} type="submit">Submit</button>
+        <button className={css.button} type="submit">
+          Submit
+        </button>
       </Form>
     </Formik>
+    // <Formik
+    //   initialValues={initialValues}
+    //   onSubmit={onSubmit}
+    //   validationSchema={FormSchema}
+    // >
+    //   <Form className={css.formContact}>
+    //     <label htmlFor={nameFieldId}>Name</label>
+    //     <Field
+    //       className={css.inputContact}
+    //       type="text"
+    //       name="username"
+    //       id={nameFieldId}
+    //     />
+    //     <ErrorMessage
+    //       className={css.errorMessage}
+    //       name="username"
+    //       component="span"
+    //     />
+    //     <label htmlFor={numberFieldId}>Number</label>
+    //     <Field
+    //       className={css.inputContact}
+    //       type="text"
+    //       name="number"
+    //       id={numberFieldId}
+    //     />
+    //     <ErrorMessage
+    //       className={css.errorMessage}
+    //       name="number"
+    //       component="span"
+    //     />
+    //     <button className={css.addContactBtn} type="submit">
+    //       Add contact
+    //     </button>
+    //   </Form>
+    // </Formik>
   );
-};
+}

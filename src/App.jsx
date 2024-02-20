@@ -1,45 +1,89 @@
-import "./App.css";
 import { useState, useEffect } from "react";
-import { ContactList } from "./ContactList/ContactList";
-import { SearchBox } from "./SearchBox/SearchBox";
-import { ContactForm } from "./ContactForm/ContactForm";
+import { nanoid } from "nanoid";
+import "./App.css";
 
-function App() {
+import ContactForm from "./ContactForm/ContactForm";
+import ContactList from "./ContactList/ContactList";
+import SearchBox from "./SearchBox/SearchBox";
+
+const KEY_CONTACTS_LS = "Contacts";
+
+export default function App() {
   const [contacts, setContacts] = useState(() => {
-    const savedContacts = window.localStorage.getItem("contacts");
-    return savedContacts
-      ? JSON.parse(savedContacts)
-      : [];
+    const savedContacts = localStorage.getItem(KEY_CONTACTS_LS);
+    return savedContacts ? JSON.parse(savedContacts) : [];
   });
 
+  const [searchName, setSearchName] = useState("");
+
   useEffect(() => {
-    window.localStorage.setItem("contacts", JSON.stringify(contacts));
+    localStorage.setItem(KEY_CONTACTS_LS, JSON.stringify(contacts));
   }, [contacts]);
 
-  const [nameValue, setNameValue] = useState("");
+  function formatPhoneNumber(phoneNumber) {
+    phoneNumber = phoneNumber.replace(/\s/g, "").replace(/\+?38/, "");
 
-  const handleSearchSubmit = (value) => {
-    setNameValue(value);
+    const digits = phoneNumber.replace(/\D/g, "");
+
+    let formattedNumber = "+38 (";
+
+    for (let i = 0; i < digits.length; i++) {
+      if (
+        (digits.length === 6 && i === 5) ||
+        (digits.length === 8 && (i === 5 || i === 7))
+      ) {
+        formattedNumber += digits[i];
+      } else {
+        if (i < 3) {
+          formattedNumber += digits[i];
+        } else if (i === 3) {
+          formattedNumber += ") " + digits[i];
+        } else if (i === 5 || i === 7) {
+          formattedNumber += digits[i] + "-";
+        } else {
+          formattedNumber += digits[i];
+        }
+      }
+    }
+
+    return formattedNumber;
+  }
+
+  const handleAddContactBtn = (values, actions) => {
+    actions.resetForm();
+    setContacts((currentContacts) => {
+      const newContact = {
+        id: nanoid(10),
+        name: (values.username =
+          values.username.charAt(0).toUpperCase() + values.username.slice(1)),
+        number: formatPhoneNumber(values.tel),
+      };
+      const updatedContacts = [...currentContacts, newContact];
+      window.localStorage.setItem("contacts", JSON.stringify(updatedContacts));
+      return updatedContacts;
+    });
   };
 
-  const deleteContact = (id) => {
-    const updatedContacts = contacts.filter((contact) => contact.id !== id);
-    setContacts(updatedContacts);
-    window.localStorage.setItem("contacts", JSON.stringify(updatedContacts));
+  const handleSearch = (event) => {
+    setSearchName(event.target.value.trim());
   };
+
+  const handleDeleteBtn = (id) => {
+    setContacts(contacts.filter((contact) => contact.id !== id));
+  };
+
+  const searchContacts = searchName
+    ? contacts.filter((contact) => {
+        return contact.name.toLowerCase().includes(searchName.toLowerCase());
+      })
+    : contacts;
 
   return (
-    <>
+    <div>
       <h1>Phonebook</h1>
-      <ContactForm setContacts={setContacts} />
-      <SearchBox onSubmit={handleSearchSubmit} />
-      {contacts.length !== 0 ? (
-        <ContactList nameValue={nameValue} deleteContact={deleteContact} />
-      ) : (
-        <p className="noContacts">There are no contacts yet</p>
-      )}
-    </>
+      <ContactForm onSubmit={handleAddContactBtn} />
+      <SearchBox inputValue={searchName} handleSearch={handleSearch} />
+      <ContactList contacts={searchContacts} onDelete={handleDeleteBtn} />
+    </div>
   );
 }
-
-export default App;
