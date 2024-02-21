@@ -7,7 +7,7 @@ export default function Contact({ contact: { id, name, number }, onDelete }) {
     <>
       <div className={css.contact_div}>
         <IoPerson className={css.icon} />
-        <p className={css.pf}>{name}</p>
+        <p className={css.p}>{name}</p>
         <BsFillTelephoneFill className={css.icon} />
         <p className={css.p}>{number}</p>
       </div>

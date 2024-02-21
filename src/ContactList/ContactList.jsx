@@ -1,4 +1,4 @@
-import Contact from "./Contact/Contact";
+import Contact from "../Contact/Contact";
 import css from "./ContactList.module.css";
 
 export default function ContactList({ contacts, onDelete }) {
@@ -13,7 +13,7 @@ export default function ContactList({ contacts, onDelete }) {
           ))}
         </ul>
       ) : (
-        <span>Contacts not found</span>
+        <span className={css.contacts_none}>Contacts not found</span>
       )}
     </>
   );

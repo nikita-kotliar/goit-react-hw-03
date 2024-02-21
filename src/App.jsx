@@ -58,9 +58,7 @@ export default function App() {
           values.username.charAt(0).toUpperCase() + values.username.slice(1)),
         number: formatPhoneNumber(values.tel),
       };
-      const updatedContacts = [...currentContacts, newContact];
-      window.localStorage.setItem("contacts", JSON.stringify(updatedContacts));
-      return updatedContacts;
+      return [...currentContacts, newContact];
     });
   };
 
